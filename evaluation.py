@@ -1,6 +1,6 @@
 from util import *  # noqa
 import numpy as np
-from collections import dequeue
+# from collections import dequeue
 
 # Add your import statements here
 
@@ -304,7 +304,7 @@ class Evaluation:
         # top_k_ideal = self.get_top_k_ideal(query_id, qrels, k)
         # ideal_dcgs = self.dcg(top_k_ideal)
 
-        return dcgs / ideal_dcgs
+        # return dcgs / ideal_dcgs
 
     def meanNDCG(self, doc_IDs_ordered, query_ids, qrels, k):
         """
