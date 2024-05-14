@@ -52,3 +52,17 @@ def get_vocab(docs):
                     seen[word] = counter
                     counter+=1
     return seen,len(seen)
+
+def word_pool(docs):
+    """
+    pools all the words in a list for each sentence to a list for each doc for all docs
+    :param docs: a list of docs in which each doc is a list of sentences which are lists of words
+    :return: a list of docs in which each doc is a list of words
+    """
+    new_docs = []
+    for doc in docs:
+        new_doc = []
+        for sentence in doc:
+            new_doc += sentence
+        new_docs.append(new_doc)
+    return new_docs

@@ -170,6 +170,7 @@ class SearchEngine:
         processedDocs = self.preprocessDocs(docs)
 
         # Build document index
+        # self.informationRetriever.buildIndexSpacy(word_pool(processedDocs),doc_ids)
         self.informationRetriever.buildIndex(processedDocs, doc_ids)
         # Rank the documents for each query
         doc_IDs_ordered = self.informationRetriever.rank(processedQueries)
@@ -198,18 +199,16 @@ class SearchEngine:
                 + ", "
                 + str(fscore)
             )
-            # MAP = self.evaluator.meanAveragePrecision(
-            # doc_IDs_ordered, query_ids, qrels, k)
-            # MAPs.append(MAP)
-            MAPs.append(0.0)
-            # nDCG = self.evaluator.meanNDCG(
-            # doc_IDs_ordered, query_ids, qrels, k)
-            # nDCGs.append(nDCG)
-            nDCGs.append(0.0)
-            # print("MAP, nDCG @ " +
-            # str(k) + " : " + str(MAP) + ", " + str(nDCG))
+            MAP = self.evaluator.meanAveragePrecision(
+            doc_IDs_ordered, query_ids, qrels, k)
+            MAPs.append(MAP)
+            nDCG = self.evaluator.meanNDCG(
+            doc_IDs_ordered, query_ids, qrels, k)
+            nDCGs.append(nDCG)
+            print("MAP, nDCG @ " +
+            str(k) + " : " + str(MAP) + ", " + str(nDCG))
 
-        # Plot the metrics and save plot
+        # # Plot the metrics and save plot
         plt.plot(range(1, 11), precisions, label="Precision")
         plt.plot(range(1, 11), recalls, label="Recall")
         plt.plot(range(1, 11), fscores, label="F-Score")

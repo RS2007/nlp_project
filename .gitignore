@@ -2,3 +2,4 @@ __pycache__
 cranfield
 output
 .DS_Store
+logs.txt

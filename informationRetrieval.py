@@ -72,8 +72,9 @@ class InformationRetrieval:
             query_vec = [0 for _ in range(len(self.vocab_map))]
             for sentence in query:
                 for token in sentence:
-                    for token in self.vocab_map:
+                    if token in self.vocab_map:
                         query_vec[self.vocab_map[token] - 1] += 1
+
 
             query_vec = np.array(query_vec)
             matrix_product = query_vec @ self.tfidf
@@ -86,6 +87,7 @@ class InformationRetrieval:
                     np.linalg.norm(query_vec) * np.linalg.norm(col.toarray())
                 )
             doc_IDs_ordered.append(np.argsort(matrix_product)[::-1])
+
 
         # Fill in code here
 
