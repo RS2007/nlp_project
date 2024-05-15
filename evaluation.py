@@ -28,7 +28,12 @@ class Evaluation:
                     The precision value as a number between 0 and 1
         """
 
+
         true_pos = len(list(set(query_doc_IDs_ordered[:k]).intersection(true_doc_IDs)))
+        if true_pos == 0:
+            print(f"Got 0 precision for k={k},query_id = {query_id}")
+            print(f"True: {true_doc_IDs}")
+            print(f"Got: {list(set(query_doc_IDs_ordered[:k]))}")
         return (true_pos) / k
 
     def meanPrecision(self, doc_IDs_ordered, query_ids, qrels, k):
@@ -382,10 +387,6 @@ class Evaluation:
 
         count = 1
         sum_precision = 0
-        print("Query average precision start")
-        print(true_doc_IDs)
-        print(query_doc_IDs_ordered)
-        print("Query average precision end")
         for i in range(k):
             try:
                 if query_doc_IDs_ordered[i] in true_doc_IDs:

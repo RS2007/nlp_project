@@ -174,27 +174,53 @@ class SearchEngine:
 
         # Build document index
         # self.informationRetriever.buildIndexSpacy(word_pool(processedDocs),doc_ids)
-        self.informationRetriever.buildIndexForTitle(processedDocs,processedDocTitles, doc_ids)
-        self.informationRetriever.buildBM25WithTitle(processedDocs,processedDocTitles)
         # Rank the documents for each query
 
         # self.informationRetriever.rankLSA(processedQueries)
         # return
-        doc_IDs_ordered = self.informationRetriever.rank(processedQueries)
         # Read relevance judements
         qrels = json.load(open(args.dataset + "cran_qrels.json", "r"))[:]
 
         # Calculate precision, recall, f-score, MAP and nDCG for k = 1 to 10
         # precisions, recalls, fscores, MAPs, nDCGs = [], [], [], [], []
-        iterations = 11
+        iterations = 10
+
+        # self.informationRetriever.buildIndexForTitle(processedDocs,processedDocTitles, doc_ids)
+        # self.informationRetriever.buildBM25WithTitle(processedDocs,processedDocTitles)
 
         plotter = Plotter()
-        plotter.plot_results(doc_IDs_ordered,query_ids,qrels,args.out_folder,key="vector_space_model",iterations=iterations)
+        # doc_IDs_ordered = self.informationRetriever.rank(processedQueries)
+        # plotter.plot_results(doc_IDs_ordered,query_ids,qrels,args.out_folder,key="vector_space_model_bigram_with_title",iterations=iterations)
 
-        doc_IDs_ordered = self.informationRetriever.rankWithBM(processedQueries)
-        plotter.plot_results(doc_IDs_ordered,query_ids,qrels,args.out_folder,key="bm25_model",iterations=iterations)
+        # doc_IDs_ordered = self.informationRetriever.rankWithBM(processedQueries)
+        # plotter.plot_results(doc_IDs_ordered,query_ids,qrels,args.out_folder,key="bm25_model_with_title",iterations=iterations)
+
+        # self.informationRetriever.buildIndexBigram(processedDocs, doc_ids)
+        # self.informationRetriever.buildBM25(processedDocs,processedDocTitles)
+
+        # doc_IDs_ordered = self.informationRetriever.rank(processedQueries)
+        # plotter.plot_results(doc_IDs_ordered,query_ids,qrels,args.out_folder,key="vector_space_model_bigram_without_title",iterations=iterations)
+
+
+        # doc_IDs_ordered = self.informationRetriever.rankWithBM(processedQueries)
+        # plotter.plot_results(doc_IDs_ordered,query_ids,qrels,args.out_folder,key="bm25_model_without_title",iterations=iterations)
+
+
+        # self.informationRetriever.buildIndexSK(processedDocs, doc_ids)
+
+        # doc_IDs_ordered = self.informationRetriever.rank(processedQueries)
+        # plotter.plot_results(doc_IDs_ordered,query_ids,qrels,args.out_folder,key="vector_space_model_unigram_without_title",iterations=iterations)
 
         
+        # self.informationRetriever.buildIndexForTitle(processedDocs,processedDocTitles, doc_ids,unigram=True)
+        # doc_IDs_ordered = self.informationRetriever.rank(processedQueries)
+        # plotter.plot_results(doc_IDs_ordered,query_ids,qrels,args.out_folder,key="vector_space_model_unigram_with_title",iterations=iterations)
+        self.informationRetriever.buildIndexSK(processedDocs,doc_ids)
+        # self.informationRetriever.buildLSAIndex(processedDocs,doc_ids)
+        doc_IDs_ordered = self.informationRetriever.rankWithSK(processedQueries)
+        plotter.plot_results(doc_IDs_ordered,query_ids,qrels,args.out_folder,key="",iterations=iterations)
+
+
 
 
 
@@ -212,16 +238,19 @@ class SearchEngine:
 
         # Read documents
         docs_json = json.load(open(args.dataset + "cran_docs.json", "r"))[:]
-        doc_ids, docs = (
+        doc_ids, docs,docs_title = (
             [item["id"] for item in docs_json],
             [item["body"] for item in docs_json],
+            [item["title"] for item in docs_json],
         )
         # Process documents
         processedDocs = self.preprocessDocs(docs)
+        processedTitles = self.preprocessDocs(docs_title)
 
         # Build document index
-        self.informationRetriever.buildIndex(processedDocs, doc_ids)
+        self.informationRetriever.buildIndex(processedDocs,processedTitles, doc_ids)
         # Rank the documents for the query
+
         doc_IDs_ordered = self.informationRetriever.rank([processedQuery])[0]
 
         # Print the IDs of first five documents

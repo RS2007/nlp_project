@@ -9,7 +9,7 @@ class Plotter:
         precisions, recalls, fscores, MAPs, nDCGs = [], [], [], [], []
         # print(bm25_results)
 
-        for k in range(1, iterations):
+        for k in range(1, iterations+1):
             precision = self.evaluator.meanPrecision(
                 doc_IDs_ordered, query_ids, qrels, k
             )
@@ -38,11 +38,11 @@ class Plotter:
             str(k) + " : " + str(MAP) + ", " + str(nDCG))
 
         # # Plot the metrics and save plot
-        plt.plot(range(1, iterations), precisions, label="Precision")
-        plt.plot(range(1, iterations), recalls, label="Recall")
-        plt.plot(range(1, iterations), fscores, label="F-Score")
-        plt.plot(range(1, iterations), MAPs, label="MAP")
-        plt.plot(range(1, iterations), nDCGs, label="nDCG")
+        plt.plot(range(1, iterations+1), precisions, label="Precision")
+        plt.plot(range(1, iterations+1), recalls, label="Recall")
+        plt.plot(range(1, iterations+1), fscores, label="F-Score")
+        plt.plot(range(1, iterations+1), MAPs, label="MAP")
+        plt.plot(range(1, iterations+1), nDCGs, label="nDCG")
         plt.legend()
         plt.title("Evaluation Metrics - Cranfield Dataset")
         plt.xlabel("k")
