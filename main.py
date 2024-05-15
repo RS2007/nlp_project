@@ -1,4 +1,5 @@
 from sentenceSegmentation import SentenceSegmentation
+from plotter import Plotter
 from tokenization import Tokenization
 from inflectionReduction import InflectionReduction
 from stopwordRemoval import StopwordRemoval
@@ -8,7 +9,6 @@ from evaluation import Evaluation
 from sys import version_info
 import argparse
 import json
-import matplotlib.pyplot as plt
 
 # Input compatibility for Python 2 and Python 3
 if version_info.major == 3:
@@ -162,62 +162,42 @@ class SearchEngine:
 
         # Read documents
         docs_json = json.load(open(args.dataset + "cran_docs.json", "r"))[:]
-        doc_ids, docs = (
+        doc_ids, docs,docs_title = (
             [item["id"] for item in docs_json],
             [item["body"] for item in docs_json],
+            [item["title"] for item in docs_json],
         )
         # Process documents
         processedDocs = self.preprocessDocs(docs)
+        processedDocTitles = self.preprocessDocs(docs_title)
+
 
         # Build document index
         # self.informationRetriever.buildIndexSpacy(word_pool(processedDocs),doc_ids)
-        self.informationRetriever.buildIndex(processedDocs, doc_ids)
+        self.informationRetriever.buildIndexForTitle(processedDocs,processedDocTitles, doc_ids)
+        self.informationRetriever.buildBM25WithTitle(processedDocs,processedDocTitles)
         # Rank the documents for each query
-        doc_IDs_ordered = self.informationRetriever.rank(processedQueries)
 
+        # self.informationRetriever.rankLSA(processedQueries)
+        # return
+        doc_IDs_ordered = self.informationRetriever.rank(processedQueries)
         # Read relevance judements
         qrels = json.load(open(args.dataset + "cran_qrels.json", "r"))[:]
 
         # Calculate precision, recall, f-score, MAP and nDCG for k = 1 to 10
-        precisions, recalls, fscores, MAPs, nDCGs = [], [], [], [], []
-        for k in range(1, 11):
-            precision = self.evaluator.meanPrecision(
-                doc_IDs_ordered, query_ids, qrels, k
-            )
-            precisions.append(precision)
-            recall = self.evaluator.meanRecall(doc_IDs_ordered, query_ids, qrels, k)
-            recalls.append(recall)
-            fscore = self.evaluator.meanFscore(doc_IDs_ordered, query_ids, qrels, k)
-            fscores.append(fscore)
-            print(
-                "Precision, Recall and F-score @ "
-                + str(k)
-                + " : "
-                + str(precision)
-                + ", "
-                + str(recall)
-                + ", "
-                + str(fscore)
-            )
-            MAP = self.evaluator.meanAveragePrecision(
-            doc_IDs_ordered, query_ids, qrels, k)
-            MAPs.append(MAP)
-            nDCG = self.evaluator.meanNDCG(
-            doc_IDs_ordered, query_ids, qrels, k)
-            nDCGs.append(nDCG)
-            print("MAP, nDCG @ " +
-            str(k) + " : " + str(MAP) + ", " + str(nDCG))
+        # precisions, recalls, fscores, MAPs, nDCGs = [], [], [], [], []
+        iterations = 11
 
-        # # Plot the metrics and save plot
-        plt.plot(range(1, 11), precisions, label="Precision")
-        plt.plot(range(1, 11), recalls, label="Recall")
-        plt.plot(range(1, 11), fscores, label="F-Score")
-        plt.plot(range(1, 11), MAPs, label="MAP")
-        plt.plot(range(1, 11), nDCGs, label="nDCG")
-        plt.legend()
-        plt.title("Evaluation Metrics - Cranfield Dataset")
-        plt.xlabel("k")
-        plt.savefig(args.out_folder + "eval_plot.png")
+        plotter = Plotter()
+        plotter.plot_results(doc_IDs_ordered,query_ids,qrels,args.out_folder,key="vector_space_model",iterations=iterations)
+
+        doc_IDs_ordered = self.informationRetriever.rankWithBM(processedQueries)
+        plotter.plot_results(doc_IDs_ordered,query_ids,qrels,args.out_folder,key="bm25_model",iterations=iterations)
+
+        
+
+
+
 
     def handleCustomQuery(self):
         """

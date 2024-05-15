@@ -42,6 +42,13 @@ def cosine_sim(vec1, vec2):
     return np.dot(vec1, vec2) / (np.linalg.norm(vec1) * np.linalg.norm(vec2))
 
 
+def flatten_3d_matrix(matrix_3d):
+    flattened_matrix = []
+    for entry in matrix_3d:
+        flattened_entry = [' '.join(row) for row in entry]
+    flattened_matrix.append(flattened_entry)
+
+    return flattened_matrix
 def get_vocab(docs):
     seen = {}
     counter = 1
